@@ -9,18 +9,6 @@ module Api
                     }, staus: :ok
             end
 
-            # def index
-            #     room = {
-            #     id: @current_employee.belongs_room.id,
-            #     name:  @current_employee.room_chief.name
-            #     }
-                     
-
-            #     render json: {
-            #         rooms: [room], 
-            #         tempId:@current_employee.id
-            #         }, staus: :ok
-            # end
 
             def invite_employees
                 sleep(2)
@@ -45,9 +33,9 @@ module Api
             def send_rooms
                rooms = @current_employee.room_companions.map{|c|
                 {
-               id: c.belongs_room.id,
-               name: c.name,
-               image: c.image
+                    id: c.belongs_room.id,
+                    name: c.name,
+                    image: c.image
                  }
             }
             end

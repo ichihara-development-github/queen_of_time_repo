@@ -1,8 +1,6 @@
 import React from "react"
 import { GoogleMap, LoadScript, Marker, Circle } from "@react-google-maps/api";
 
-const GOOGLE_MAP_API_KEY="AIzaSyBKnVvlCy9D9nY3-WJ5frpbVzuZK3DIy2Y"
-
 import Icon from "../../images/offices-buildings-svgrepo-com.svg";
 const containerStyle = {
     width: "100%",
@@ -22,10 +20,11 @@ const containerStyle = {
     visible: true,
     radius: 30000,
   };
-
+ 
 export const TimestampMap = ({myPosition, officePosition}) => (
 
-        <LoadScript googleMapsApiKey={GOOGLE_MAP_API_KEY}>
+        <LoadScript googleMapsApiKey={process.env.GOOGLE_MAP_API_KEY}>
+          
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={myPosition}
