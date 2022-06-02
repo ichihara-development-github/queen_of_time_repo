@@ -35,6 +35,16 @@ module Api
                 params.require(:session).permit(:email, :password)
             end
 
+            def initial_params
+
+                # {
+                #     attendance: attendance.count,
+                #     shift: shift.count,
+                #     notification: notification,
+                #     chat: chat
+                # }
+            end
+
 
         end
 

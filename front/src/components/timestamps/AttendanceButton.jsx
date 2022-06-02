@@ -51,10 +51,10 @@ const success = (position) => {
         lng: coords.longitude
       }
      
-      if (!checkDistance(myPosition)){
+      // if (!checkDistance(myPosition)){
        
-        return false
-      }
+      //   return false
+      // }
 
 
       createTimestamp({attendance_time: (position.timestamp / 1000)})

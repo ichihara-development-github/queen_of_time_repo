@@ -2,7 +2,7 @@ import React from "react"
 
 import { DetailModal } from "./DetailModal";
 
-import { DataGrid, GridColDef, GridToolbar, jaJP } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, jaJP } from '@mui/x-data-grid';
 import styled from "styled-components"
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -28,8 +28,8 @@ font-weight:bold
 export const AttendanceGraph = ({
     state, 
     list,
-    handleCheck}
-    ) => {
+    handleCheck
+  }) => {
 
   let config = 6;
   
@@ -142,7 +142,6 @@ export const AttendanceGraph = ({
       return(
       <>  
           <Box sx={{height: "100%", position: "relative"}}>
-            {console.log(state)}
           {state == 'OK' ?
             <DataGrid
             rows={list}

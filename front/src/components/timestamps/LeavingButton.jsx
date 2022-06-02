@@ -35,9 +35,9 @@ const dynamicStyle = {
 const success = (position) => {
     const coords = position.coords
   
-      if (!checkDistance(coords)){
-        return false
-      }
+      // if (!checkDistance(coords)){
+      //   return false
+      // }
 
       
       const myPosition = {

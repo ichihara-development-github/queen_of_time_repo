@@ -1,11 +1,11 @@
 import React, { useEffect, useReducer, useState } from "react"
 
-import { Button, Stack } from "@mui/material";
-import { AttendanceModal } from "../components/attendances/AttendanceModal";
+import { Button, CircularProgress, List, Stack } from "@mui/material";
 import { AttendanceReducer, initialState } from "../reducers/attendances";
 import { AttendanceGraph } from "../components/attendances/AttendanceGraph";
-import { fetchManageAttendance } from "../apis/attendance";
-import { approveRequest } from "../apis/timestamp";
+import { approveRequest, fetchManageAttendance } from "../apis/attendance";
+import { } from "../apis/timestamp";
+import { SelectDate } from "../components/shared/SelectDate";
 
 const SCALE = 4;
 
@@ -21,6 +21,8 @@ export const ManageAttendance = ({
 
 const [checked, setChecked]= useState([]);
 const [state, dispatch] = useReducer(AttendanceReducer, initialState);
+const [list, setList] = useState([]);
+const [loading, setLoading] = useState(false);
 
 const handleCheck = (e) => {
     
@@ -38,16 +40,19 @@ const handleCheck = (e) => {
 } 
 
 
-const approvTimecard = () => {
+const approveTimecard = () => {
+  setLoading(true)
   var ids = checked.map(elm => elm.id)
   try {
-    dispatch({type: "FETCHING"});
-    approveRequest(ids).then((data) => {
-    dispatch({type: "FETCH_END",
-    payload: {
-        attendances: data.attendances
-    }})
-    setSbParams({variant: "error", content: "承認できませんでした", open: true})
+    approveRequest(ids)
+    .then(res => {
+      if(res.status !== 200){
+        setSbParams({variant: "error", content: "承認できませんでした", open: true})
+        setLoading(true)
+        return
+      }
+      setList(res.data.attendances)
+      setSbParams({variant: "success", content: "勤怠を承認しました", open: true})
   })
   }catch (e){
     console.log(e.message);
@@ -61,11 +66,8 @@ const approvTimecard = () => {
       dispatch({type: "FETCHING"});
       fetchManageAttendance()
       .then((res) => {
-        console.log(res.data)
       dispatch({type: "FETCH_END",
-      payload: {
-          attendances: res.data.attendances
-      }
+      payload: res.data.attendances
     })
     setBadge({...badge,
        attendance: res.data.attendances.filter(elm => elm.confirmed == false).length})
@@ -78,34 +80,36 @@ const approvTimecard = () => {
       return(
       <>      
       <div style={{ height: 450, width: '95%', margin: 30 }}>
+        <Stack sx={{my:2}} direction="row">
+        <SelectDate 
+          list={state.attendanceData}
+          setList={setList}
+          />
+          <Button 
+            style={{marginLeft: "auto"}}
+            variant="contained" 
+            color="success"
+            disabled={(checked.length == 0 || loading)}
+            onClick={() => 
+              {if (confirm("選択中の勤怠を承認しますか？"))
+              {approveTimecard()}
+            }}
+            endIcon={loading ? <CircularProgress sx={{width: "1rem", height: "1rem"}} />:""}
+
+            >
+            　　　承　認　　　
+        </Button>
+
+
+        </Stack>
+
+        
             
           <AttendanceGraph 
-            state={state} 
-            setOpenState={setOpenState} 
-            setChecked={setChecked}
+            state={state.fetchState} 
+            list={list}
             handleCheck={handleCheck}
           />
-          <Stack sx={{p:1}} spacing={2} direction="row">
-          <Button 
-              size="large"
-              variant="contained" 
-              color="success"
-              disabled={checked.length == 0}
-              onClick={() => 
-                {if (confirm("選択中の勤怠を承認しますか？"))
-                {approvTimecard()}
-              }}
-
-              >
-              　　　承　認　　　
-          </Button>
-
-          <AttendanceModal 
-            params={checked} 
-            setSbParams={setSbParams}
-          />
-
-          </Stack>
 
       </div>
 

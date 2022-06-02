@@ -12,7 +12,7 @@ import { useDateFilter } from '../../customeHooks/hooks';
 export const SelectDate = ({
     list,
     setList,
-    setDate,
+    setDate=function(date){console.log(date)},
 }) => {
   
 

@@ -37,7 +37,7 @@ module Api
                     date: Time.at(params[:timestamps][:attendance_time])
                 )
 
-                return  render json: {name: @employee.name}, status: :created if timestamp.save!
+                return  render json: {name: @current_employee.name}, status: :created if timestamp.save!
             end
 
             def update
@@ -56,10 +56,10 @@ module Api
             end
 
             def approve
-                ids = params[:ids]
-                organization = Timestamp.find(ids[0]).employee.organization
-                if Timestamp.where(id: ids).update(confirmed: true)
-                    render json: {attendances:  Timestamp.where(id: organization.employees.ids)}, status: :ok
+                debugger
+                timestamps = Timestamp.where(id: params[:ids])
+                if timestamps.update(confirmed: true)
+                    render json: {attendances: timestamps}, status: :ok
                 else
                     render json: {},status: :intternal_server_error
                 end

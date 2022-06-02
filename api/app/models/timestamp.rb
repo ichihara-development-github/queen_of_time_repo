@@ -41,7 +41,7 @@ class Timestamp < ApplicationRecord
             working_time: working_time.floor,
             rest_time: rest_time,
             overtime: overtime.floor,
-            midnight_time: midnight_time.floor,
+            midnight_time: [working_time,midnight_time].min.floor,
             midnight_overtime: midnight_overtime.floor
         )
            
