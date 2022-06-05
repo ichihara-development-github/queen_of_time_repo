@@ -24,7 +24,8 @@ module Api
             def check_session
                 render json: {
                     name: @current_employee.name,
-                    chief: @current_employee.chief},
+                    chief: @current_employee.chief,
+                    badges: @current_employee.chief ? badge_params : {}},
                     status: :ok if @current_employee
             end
 
@@ -35,14 +36,13 @@ module Api
                 params.require(:session).permit(:email, :password)
             end
 
-            def initial_params
+            def badge_params
 
-                # {
-                #     attendance: attendance.count,
-                #     shift: shift.count,
-                #     notification: notification,
-                #     chat: chat
-                # }
+                params = {
+                    attendance: @organization.timestamps.where(confirmed: false).count,
+                    shift:  @organization.shifts.where(confirmed: false).count,
+                    notification:  @current_employee.notifications.unread.count,
+                }
             end
 
 

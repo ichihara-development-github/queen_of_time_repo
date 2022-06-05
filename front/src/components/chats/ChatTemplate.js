@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'clsx';
 import Grid from '@material-ui/core/Grid';
@@ -8,25 +8,49 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import defaultChatMsgStyles from '@mui-treasury/styles/chatMsg/default';
 
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+
+import { IconButton } from '@mui/material';
+
+const timeStyle = {
+  position:"absolute",
+  top:-20, 
+  left:0,
+  color:"#808080"
+}
+
+const deleteStyle = {
+  position:"absolute",
+  top:10,
+  left:-30,
+  color:"#808080",
+}
+
+
+
 const ChatTemplate = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props => {
   const {
     classes,
     avatar,
-    messages,
+    message,
+    roomId,
     time,
+    cancelSend,
     side,
     GridContainerProps,
     GridItemProps,
     AvatarProps,
     getTypographyProps,
   } = props;
-
   
+  const [deletable, setDeletable] = useState(false);
+console.log(message)
+
   const attachClass = index => {
     if (index === 0) {
       return classes[`${side}First`];
     }
-    if (index === messages.length - 1) {
+    if (index === [message.content].length - 1) {
       return classes[`${side}Last`];
     }
     return '';
@@ -49,30 +73,43 @@ const ChatTemplate = withStyles(defaultChatMsgStyles, { name: 'ChatMsg' })(props
       )}
       <Grid item xs={8}>
 
-        {messages.map((msg, i) => {
+        {[message.content].map((msg, i) => {
           
           const TypographyProps = getTypographyProps(msg, i, props);
           return (
             // eslint-disable-next-line react/no-array-index-key
             <div 
-              key={msg.id || i} 
+              key={i} 
               className={classes[`${side}Row`]}
-            >
+            >  
               <Typography
                 align={'left'}
-                {...TypographyProps}
-                className={cx(
-                  classes.msg,
-                  classes[side],
-                  attachClass(i),
-                  TypographyProps.className
-                )}
-                style={{position: "relative"}}
-              >
-                {msg}
-                <span style={{position:"absolute", top:-20, left:0,color:"#808080"}}>
-               {time}
-             </span>
+                  {...TypographyProps}
+                  className={cx(
+                    classes.msg,
+                    classes[side],
+                    attachClass(i),
+                    TypographyProps.className
+                  )}
+                  onMouseOver={()=>setDeletable(true)}
+                  onMouseOut={()=>setDeletable(false)}
+                  style={{position: "relative"}}
+                >
+                  {msg}
+                  <span style={timeStyle}>
+                    {time}
+                  </span>
+                
+                {side==="right" && 
+                  <IconButton 
+                    style={{...deleteStyle, display: deletable ? "block" : "none"}}
+                    onClick={()=>{
+                      if(confirm("メッセージの送信を取り消しますか？"))
+                        {cancelSend(roomId, message.id)}
+                    }}>
+                    <DeleteForeverOutlinedIcon />
+                  </IconButton>
+                }
               </Typography>
             </div>
           );

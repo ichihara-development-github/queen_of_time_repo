@@ -51,15 +51,13 @@ module Api
             def modulate_timestamps
                 debugger
                 Timestamp.find(timestamp_params[:id]).update_columns(timestamp_params.to_hash)
-
                 render json: {}, status: :ok
             end
 
             def approve
-                debugger
                 timestamps = Timestamp.where(id: params[:ids])
                 if timestamps.update(confirmed: true)
-                    render json: {attendances: timestamps}, status: :ok
+                    render json: {attendances: @organization.timestamps}, status: :ok
                 else
                     render json: {},status: :intternal_server_error
                 end

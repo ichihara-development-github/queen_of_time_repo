@@ -68,6 +68,7 @@ const  App = () => (
 
   <Router>
     <SnackbarProvider>
+    <BadgeProvider>
       <AuthProvider>  
       <Switch>
       <Route path="/signup" component={SignUp} />
@@ -75,7 +76,6 @@ const  App = () => (
       <Route exact path="/" component={Home} />
        
       <ConfigProvider>
-        <BadgeProvider>
           <AuthenticatedRoute
               exact
               path="/Dashboard"
@@ -97,11 +97,11 @@ const  App = () => (
           path="/chat" 
           component={Chat}
         />
-        </BadgeProvider>
       </ConfigProvider>
      
     </Switch> 
     </AuthProvider>
+    </BadgeProvider>
   </SnackbarProvider>
 </Router>
 

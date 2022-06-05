@@ -11,31 +11,25 @@ module Api
 
 
             def invite_employees
-                sleep(2)
-                employees = @current_employee.organization.employees
-                .where.not(id: @current_employee.room_companions.ids.push(@current_employee.id))
+                employees = @organization.employees.select_companions(@current_employee)
                 render json: {employees: employees}, staus: :ok
             end
 
             def create
-                companion = Employee.find(params[:rooms][:id])
-                render json: {}, status: :internal_server_error unless @current_employee.invitable?(companion) 
-                
-                room = @current_employee.rooms.build(
-                    companion_id: params[:rooms][:id]
-                )
-                if room.save!
-                     render json: {rooms: send_rooms}, status: :created
+                if  room = @current_employee.rooms.create!
+                    room.employees << Employee.find(params[:rooms][:id])
+                    render json: {rooms: send_rooms}, status: :created
                 end
             end
 
 
             def send_rooms
-               rooms = @current_employee.room_companions.map{|c|
+               @current_employee.rooms.map{|r|
+               companion = r.companion(@current_employee)
                 {
-                    id: c.belongs_room.id,
-                    name: c.name,
-                    image: c.image
+                    id: r.id,
+                    name: companion.name,
+                    image: companion.image
                  }
             }
             end

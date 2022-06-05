@@ -3,18 +3,16 @@ import { Task } from "./Task";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 
-export const Tasks = ({taskList,settaskList}) =>{
+export const Tasks = ({taskList,setTaskList}) =>{
 
     const reorder=(taskList, startIndex, endIndex)=>{
         const remove = taskList.splice(startIndex, 1);
         taskList.splice(endIndex, 0, remove[0])
-
-
     };
 
     const handleDragEnd=(result)=>{
         reorder(taskList, result.source.index, result.destination.index);
-        settaskList(taskList);
+        setTaskList(taskList);
 
     }
     return (
@@ -29,7 +27,7 @@ export const Tasks = ({taskList,settaskList}) =>{
                                 index={index}
                                 task={task} 
                                 taskList={taskList} 
-                                settaskList={settaskList}/
+                                setTaskList={setTaskList}/
                             >
                         </div>
 

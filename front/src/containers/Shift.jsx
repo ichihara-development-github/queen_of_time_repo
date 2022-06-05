@@ -1,6 +1,7 @@
 import { Button, CircularProgress } from "@mui/material";
 import React, { useEffect, useState, useContext } from "react";
 import { deleteShift, determineShifts, fetchSubmittedShifts } from "../apis/shifts";
+import { BadgeContext } from "../contexts/badge";
 import { SnackbarContext } from '../contexts/snackBar';
 import { ShiftEdit } from "./ShiftEdit";
 
@@ -9,6 +10,8 @@ export const Shift = () => {
 const [value, setValue] = useState();
 const [loading, setLoading] = useState(false)
 const sb = useContext(SnackbarContext);
+const badge = useContext(BadgeContext);
+
 
 const undo = () => {
   fetchSubmittedShifts()
@@ -19,12 +22,15 @@ const undo = () => {
 const updateShifts = (params) => {
   setLoading(true)
   determineShifts(params)
-  .then((res) => {
-        if(res.status === 200){
-          setValue(res.data.shifts)
-          sb.setSnackBar({open: true, variant:"success",content:"シフトを確定しました。"})
-        }
-      })
+  .then(res => {
+        if(res.status !== 200){ return sb.setSnackBar({open: true, variant:"error",content:"シフトを確定できませんでした。"}) }
+        setValue(res.data.shifts)
+        sb.setSnackBar({open: true, variant:"success",content:"シフトを確定しました。"})
+        console.log(badge)
+        badge.setBadge({
+          ...badge.badge, shift: res.data.shifts.filter(elm => elm.confirmed == false).length
+        })
+  })
   setLoading(false)
 }
 

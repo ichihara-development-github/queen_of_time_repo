@@ -30,11 +30,20 @@ ActiveRecord::Schema.define(version: 2022_04_03_081016) do
     t.integer "open", default: 9, null: false
     t.integer "close", default: 18, null: false
     t.integer "min_work_time", default: 1
-    t.date "submittable_start", default: "2022-05-23", null: false
-    t.date "submittable_end", default: "2022-05-30", null: false
+    t.date "submittable_start", default: "2022-06-04", null: false
+    t.date "submittable_end", default: "2022-06-11", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["organization_id"], name: "index_configures_on_organization_id"
+  end
+
+  create_table "employee_rooms", force: :cascade do |t|
+    t.integer "employee_id"
+    t.integer "room_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["employee_id"], name: "index_employee_rooms_on_employee_id"
+    t.index ["room_id"], name: "index_employee_rooms_on_room_id"
   end
 
   create_table "employees", force: :cascade do |t|
@@ -102,13 +111,8 @@ ActiveRecord::Schema.define(version: 2022_04_03_081016) do
   end
 
   create_table "rooms", force: :cascade do |t|
-    t.integer "chief_id"
-    t.integer "companion_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["chief_id", "companion_id"], name: "index_rooms_on_chief_id_and_companion_id", unique: true
-    t.index ["chief_id"], name: "index_rooms_on_chief_id"
-    t.index ["companion_id"], name: "index_rooms_on_companion_id"
   end
 
   create_table "shifts", force: :cascade do |t|

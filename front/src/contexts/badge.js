@@ -15,14 +15,13 @@ const initialState = {
 
 export const BadgeProvider = ({children}) => {
 
-  const [params, setParams] = useState(initialState);
+  const [badge, setBadge] = useState(initialState);
    
-  
 
   return (
       <BadgeContext.Provider value={{
-          params: params,
-          setParams: setParams
+          badge,
+          setBadge: setBadge
       }}>
           {children}
       </BadgeContext.Provider>

@@ -5,7 +5,6 @@ import Button from '@mui/material/Button';
 import Slider from '@mui/material/Slider';
 
 import SendIcon from '@mui/icons-material/Send';
-import { deleteShift, determineShifts, fetchSubmittedShifts } from '../apis/shifts';
 import { SliderScales } from "../components/const";
 
 import { CircularProgress, IconButton, Stack, Typography } from '@mui/material';

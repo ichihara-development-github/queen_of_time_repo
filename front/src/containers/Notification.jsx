@@ -7,20 +7,19 @@ import { AuthContext } from "../contexts/auth"
 import { SnackbarContext } from "../contexts/snackBar"
 import { notificationsInitialState, notificationsReducer } from "../reducers/notifications"
 
-export const Notification = ({badge, setBadge}) => {
+export const Notification = () => {
 
     const [selected, setSelected] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const sb = useContext(SnackbarContext);
     const auth = useContext(AuthContext);
-
 
     const [state, dispatch] = useReducer(notificationsReducer, notificationsInitialState)
 
     const drawerWidth = 220;
 
     const viewAll = () => {
-      document.getElementById("allNotifications").classList.add("Mui-disabled")
       try{
         dispatch({type: "FETCHING"})
         fetchAllNotifications()
@@ -61,9 +60,7 @@ export const Notification = ({badge, setBadge}) => {
         })
       }
       catch(e){console.log(e)}
-  
-      setBadge({...badge, notification: state.notificationsList.length})
-          
+     
     },[])
 
     
@@ -93,8 +90,7 @@ return (
                 notification={notification}
                 selected={selected}
                 setSelected={setSelected}
-                badge={badge}
-                setBadge={setBadge}
+               
               />
           ))}
         </List>
@@ -129,6 +125,7 @@ return (
       fullWidth 
       variant="outlined" 
       color="primary"
+      disabled={loading}
       onClick={() => viewAll}
        >すべて見る</Button>
       

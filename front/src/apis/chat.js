@@ -1,5 +1,5 @@
 import axios from "axios";
-import { messageList, newMessage } from "../urls/urlList"
+import { messageList, newMessage, removeMessage } from "../urls/urlList"
 
 export const fetchMessages = (id) => {
     console.log(id)
@@ -19,3 +19,14 @@ export const  createMessage = (id,params) => {
     })
     .catch((e) =>   {throw e;})
 }
+
+
+export const  deleteMessage = (room_id, id) => {
+   
+    return axios.delete(removeMessage(room_id, id))
+    .then(res => {
+        return res
+    })
+    .catch((e) =>   {throw e;})
+}
+

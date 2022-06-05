@@ -40,30 +40,23 @@ import { ConfigContext } from '../contexts/config';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { NewEmployeeModal } from './NewEmployeeModal';
+import { BadgeContext } from '../contexts/badge';
 
 export const Management = () => {
  
   const drawerWidth = 220;
   
   const { window } = ()=>{};
-  const initialBadgeState = {
-    employees:0,
-    attendance:0,
-    chat:10,
-    notification:0,
-    shift: 0,
-  }
   
-  const [openState, setOpenState] = useState("shift");
+  
+  const [openState, setOpenState] = useState("task");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [badge, setBadge] = useState(initialBadgeState)
 
   const history = useHistory();
 
   const auth = useContext(AuthContext);
   const sb = useContext(SnackbarContext);
-  const organizationConfig = useContext(ConfigContext);
-    
+  const badge = useContext(BadgeContext); 
 
 
   const handleDrawerToggle = () => {
@@ -76,6 +69,7 @@ const handleLogout = () => {
 
 }
 
+
   const switchRender = () => {
    
     switch(openState){
@@ -83,21 +77,13 @@ const handleLogout = () => {
       case "shift":
         return (<Shift />)
       case "attendance":
-        return (<ManageAttendance 
-                  badge={badge} 
-                  setBadge={setBadge} 
-                  setOpenState={setOpenState}
-                  />)
+        return (<ManageAttendance setOpenState={setOpenState} />)
       case "calendar":
         return (<Calendar setOpenState={setOpenState} />)
       case "task":
         return (<TaskCards/>)
       case "notification":
-        return (<Notification 
-                  setBadge={setBadge}
-                  badge={badge}
-               
-        />)
+        return (<Notification />)
 
     }
   }
@@ -127,9 +113,7 @@ const handleLogout = () => {
       <Link to="/employees">
         <ListItem button >
           <ListItemIcon>
-            <Badge  id = "chatNoticeBadge"  color="error" badgeContent={badge.chat}>
                <PersonOutlineOutlinedIcon /> 
-            </Badge>
             </ListItemIcon>
             <ListItemText primary="従業員管理" />
           </ListItem>
@@ -137,9 +121,7 @@ const handleLogout = () => {
         <Link to="/chat">
         <ListItem button key="chat">
           <ListItemIcon>
-            <Badge  id = "chatNoticeBadge"  color="error" badgeContent={badge.chat}>
                <ChatOutlinedIcon /> 
-            </Badge>
             </ListItemIcon>
             <ListItemText primary="チャット" />
           </ListItem>
@@ -147,7 +129,7 @@ const handleLogout = () => {
        
           <ListItem button key="notification"  onClick={()=>{setOpenState("notification")}}>
             <ListItemIcon>
-            <Badge color="error" badgeContent={badge.notification}>
+            <Badge color="error" badgeContent={badge.badge.notification}>
                <NotificationsActiveOutlinedIcon  /> 
             </Badge>
             </ListItemIcon>
@@ -157,7 +139,7 @@ const handleLogout = () => {
        
           <ListItem button key="shift" onClick={()=>{setOpenState("shift")}}>
             <ListItemIcon>
-            <Badge color="error" badgeContent={badge.shift}>
+            <Badge color="error" badgeContent={badge.badge.shift}>
                 <BadgeOutlinedIcon /> 
             </Badge>
             </ListItemIcon>
@@ -166,7 +148,7 @@ const handleLogout = () => {
          
         <ListItem button key="attendance" onClick={()=>{setOpenState("attendance")}}>
           <ListItemIcon>
-          <Badge color="error" badgeContent={badge.attendance}>
+          <Badge color="error" badgeContent={badge.badge.attendance}>
             <AccessTimeOutlinedIcon /> 
             </Badge>
           </ListItemIcon>

@@ -24,6 +24,11 @@ export const ChatReducer = (state, action) => {
                 fetchState: REQUEST_STATUS.OK,
                 messageList: [...state.messageList,action.message]
             };
+        case "REMOVE":
+            return {
+                fetchState: REQUEST_STATUS.OK,
+                messageList: state.messageList.filter(m => m.id !== action.id)
+            };
         default:
             throw new Error();
     }

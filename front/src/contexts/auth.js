@@ -6,6 +6,7 @@ import { SnackbarContext } from "./snackBar";
 import { CircularProgress, LinearProgress, Stack } from "@mui/material";
 import CircularStatic from "../components/initialLoading";
 import { PageLoadingCircle } from "../components/shared/commonPatrs";
+import { BadgeContext } from "./badge";
 
 export const AuthContext = createContext()
 
@@ -24,7 +25,9 @@ export const AuthProvider = ({children}) => {
 
   const [state, setState] = useState(initialState);
   const history = useHistory();
+
   const sb = useContext(SnackbarContext);
+  const badge = useContext(BadgeContext);
   
     const login = (params) =>{
         createSession(params)
@@ -39,7 +42,6 @@ export const AuthProvider = ({children}) => {
               
             return
            }
-           console.log(res)
         
             setState({
               loading: false,
@@ -93,11 +95,13 @@ export const AuthProvider = ({children}) => {
   useEffect(() => {
     checkSession()
     .then((res) => {
+      console.log(res.data)
       setState({
         loading: false,
         loggedIn: true, 
         name: res.data.name, 
         chief: res.data.chief})
+        badge.setBadge(res.data.badges)
     })
     .catch((e) => {
       if (e.response.status === 403) {

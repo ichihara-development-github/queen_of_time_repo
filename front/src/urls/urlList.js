@@ -120,9 +120,6 @@ export const determineShift =
 
 
 
-
-
-
 //----------------delete-------------------
 
 
@@ -141,6 +138,14 @@ export const deleteCalendar = (Id) =>
 
 export const removeShift = (Id) => 
 `${DEFAULT_API_HOST}/employees/shifts/${Id}`
+
+
+export const removeMessage = (room_id, id) => 
+`${DEFAULT_API_HOST}/rooms/${room_id}/messages/${id}`
+
+
+
+
 
 
 //---------------------------------

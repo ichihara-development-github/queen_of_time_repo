@@ -15,7 +15,7 @@ const initialState = {
     attendance_time: 9,
     leaving_time: 19,
     comment: "",
-    confirmed: true,
+    confirmed: false,
     rest: false
 
 }
@@ -81,7 +81,7 @@ export const NewShiftForm = ({
             {getMonAndDate(date,"/")}
         </Typography>
         <Slider
-            getAriaLabel={() => 'Minimum distance'}
+          
             value={[params.attendance_time, params.leaving_time]}
             onChange={handleChange}
             marks={SliderScales}

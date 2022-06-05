@@ -2,18 +2,18 @@ module Api
     module V1
         class MessagesController < ApplicationController
 
+            before_action :set_room, only: %i[index create]
+
             def index
-                room = Room.find(params[:room_id])
-                messages = room.messages
+                messages = @room.messages
                 render json: {
-                    companion: room.companion.name,
+                    companion: @room.companion(@current_employee).name,
                     messages: messages
                     }, status: :ok
             end
 
             def create
-                room = Room.find(params[:room_id])
-                message = room.messages.create(
+                message = @room.messages.create(
                     employee_id: @current_employee.id,
                     content: params[:messages])
 
@@ -28,7 +28,15 @@ module Api
             end
 
             def destroy
+                message = Message.find(params[:id])
+                message.destroy
+                render json: {}, status: :ok
+            end
 
+            private
+
+            def set_room
+                @room = Room.find(params[:room_id])
             end
         end
     end

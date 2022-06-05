@@ -1,6 +1,8 @@
 class Timestamp < ApplicationRecord
     
     belongs_to :employee
+    has_one :organization
+
     scope :confirmed, -> {where(confirmed: true)}
 
     validates :date, uniqueness: { scope: :employee }
@@ -32,7 +34,7 @@ class Timestamp < ApplicationRecord
         rest_time = (self.updated_rest_time ||= rest_time )
         p working_time = total_time-rest_time
         p overtime = [0,(working_time - (60 * 8))].max
-        p midnight_time = [0,
+        midnight_time = [0,
                             (Time.at(self.leaving_time) - 
                             (self.date.to_time + (60 * 60 * 22))) / 60 
                            ].max

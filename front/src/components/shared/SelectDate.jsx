@@ -41,7 +41,7 @@ export const SelectDate = ({
 
     return (
     
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row"alignItems="center">
            <IconButton onClick={() => handleChangeDate("back")}>
             <ArrowBackIosNewIcon />
            </IconButton>  

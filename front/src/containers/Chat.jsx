@@ -7,18 +7,15 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
-import { Chip, CircularProgress, Drawer, ListItemAvatar } from '@mui/material';
-import { fetchMessages, createMessage } from '../apis/chat';
+import { Chip, CircularProgress, Drawer, ListItemAvatar, Switch } from '@mui/material';
+import { fetchMessages, createMessage, deleteMessage } from '../apis/chat';
 import Stack from '@mui/material/Stack';
-import transitions from '@material-ui/core/styles/transitions';
 import { ChatReducer, initialState } from '../reducers/chat';
 import { FormControlLabel, FormGroup } from '@material-ui/core';
 
-import icon from "../images/moomin.jpeg"
 import { Link, useHistory } from 'react-router-dom';
 
 import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 
 import { Avatar, AvatarGroup, ListItem, ListItemIcon, ListItemText } from "@mui/material"
 
@@ -34,9 +31,16 @@ import { fetchRooms } from '../apis/room';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import { AuthContext } from '../contexts/auth';
 import { AddChatRoom } from '../components/chats/AddChatRoom';
+import { textAlign } from '@mui/system';
 
-const initialConfig = {
-  notification: true
+const welcomeStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, 0)',
+  height: 400,
+  maxWidth: "95%",
+ 
 }
 
 export const Chat = () => {
@@ -45,7 +49,7 @@ const [state, dispatch] = useReducer(ChatReducer, initialState);
 
 const [rooms, setRooms] = useState([{id:1,name:"room1"},{id:2,name:"room2"}]);
 const [selected, setSelected] = useState({id: "",name:""});
-
+const [open, setOpen] = useState(true);
 const auth = useContext(AuthContext);
 
   const sendMessage = (id, content) => {
@@ -56,6 +60,20 @@ const auth = useContext(AuthContext);
       joinedSocket.emit("SEND_PUSH", res.data.message);
     })
     .catch(e => console.log(e))
+  }
+
+  
+  const cancelSend = (roomId, id) => {
+    deleteMessage(roomId, id)
+    .then(res => {
+      if(res.status !== 200){return}
+      dispatch({
+        type: "REMOVE",
+        id: id
+      })
+      socket.emit("CANCEL_MESSAGE", roomId, id);
+    })
+
   }
 
 
@@ -76,10 +94,19 @@ useEffect(() => {
   (async()=>{
     
   socket.on("RECIEVE_MESSAGE",(message)=>{
-    console.log("recieve")
+    console.og("add")
     dispatch({
       type: "ADD",
       message: message
+    })
+  })
+
+  
+  socket.on("REMOVE_MESSAGE",(id)=>{
+    console.log("sub")
+    dispatch({
+      type: "REMOVE",
+      id: id
     })
   })
 
@@ -98,23 +125,36 @@ return ()=> {
 },[])
 
 const drawerWidth = 240;
+const responsiveWidth = window.innerWidth > 768 ? drawerWidth : 0;
+console.log(responsiveWidth)
 
 return (
  
-    <Box  sx={{ display: 'flex' }} >
+    <Box 
+      sx={{p:1}}
+      >
      
       <AppBar
         position="fixed"
-        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+        sx={{ width: "100%", marginLeft: responsiveWidth}}
       >
-        <h4>{selected.name}</h4>
-       
+        <Stack direction="row" alignItems="center" justifyContent="center">
+          <h4>{selected.name}</h4>  
+          <FormControlLabel
+          style={{marginLeft: "auto"}}
+            control={
+              <Switch onChange={()=>setOpen(!open)} checked={open} color="default"/>
+            } 
+            label="メニュー"
+            labelPlacement="start" />   
+          
+        </Stack>
        
       </AppBar>
       
          <Drawer
            sx={{
-            width: drawerWidth,
+            width: responsiveWidth,
             flexShrink: 0,
             '& .MuiDrawer-paper': {
               width:  drawerWidth,
@@ -123,13 +163,12 @@ return (
           }}
           variant="persistent"
           anchor="left"
-          open
+          open={open}
         >
         <Box
-        role="presentation"
-        // onClick={()=>{setOpen(false)}}
+      
         >
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+      <List sx={{ width: '100%', bgcolor: 'background.paper'}}>
       　{auth.state.chief ?  
       <ListItem>
         <AddChatRoom setRooms={setRooms}/>
@@ -156,51 +195,7 @@ return (
     </List>
          
   </Box>
-    </Drawer>
-    <Box
-        component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
-        style={{position: "relative"}}
-      >   
-        
-      {
-        selected.id?
-        
-        <div>
-
-          {state.fetchState === "FETCHING"?
-           <CircularProgress
-              style={{display:"block",width: "80px", height: "80px", margin: "180px auto"}}
-              color="inherit"/>
-              :
-            <>
-            <div style={{overflow: "scroll",width:"100%",height:430 }}>
-            <ChatMessages 
-            selected={selected}
-            messages={state.messageList} 
-            setMessage={dispatch}
-          />
-            </div>
-              
-            <ChatInput
-            selected={selected}
-            sendMessage={sendMessage}
-            />
-          </>
-      }
-      </div>
-     
-      :
-      <div style={{paddingTop:100}}>
-         <ChatOutlinedIcon /> 
-          <Typography variant="h5" noWrap component="div">
-            ルームをクリックして会話を始めましょう！
-          </Typography>
-          
-      </div>
-      } 
-      </Box>
-　　　{auth.state.chief ?
+  　{auth.state.chief ?
       <div style={{position:"fixed", bottom:10, left:10, zIndex:1300}}>
         <Link to="/Dashboard">
         <Chip
@@ -214,6 +209,52 @@ return (
       :
       ""
       }
+    </Drawer>
+    <Box style={{
+        width: `calc(100% - ${responsiveWidth}px)`,
+        marginLeft: `${responsiveWidth}px`
+    }}
+    >   
+        
+      {
+        selected.id?
+        
+        <>
+
+          {state.fetchState === "FETCHING"?
+           <CircularProgress
+              style={{width: "80px", height: "80px", margin: "180px auto"}}
+              color="inherit"/>
+              :
+            <>
+            <div style={{height: 450,maxWidth: 700}}>
+            <ChatMessages 
+              selected={selected}
+              messages={state.messageList} 
+              setMessage={dispatch}
+              cancelSend={cancelSend }
+            />
+             
+            <ChatInput
+              selected={selected}
+              sendMessage={sendMessage}
+              />
+            </div>
+    
+          </>
+      }
+      </>
+     
+      :
+      <div style={welcomeStyle}>
+         <ChatOutlinedIcon /> 
+          <Typography variant="h5">
+            ルームをクリックして会話を始めましょう！
+          </Typography>
+          
+      </div>
+      } 
+      </Box>
       
     </Box>
     

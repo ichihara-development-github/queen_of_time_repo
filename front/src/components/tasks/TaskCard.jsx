@@ -1,3 +1,4 @@
+import { Box, Card, IconButton } from "@mui/material";
 import React ,{ useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 // import { TaskAddInput } from "./input/TaskAddInput";
@@ -6,45 +7,62 @@ import { TaskCardTitle } from "./TaskCardTitle";
 import { TaskAddInput } from "./TaskInputForm";
 import { Tasks } from "./Tasks";
 
+import DeleteIcon from '@mui/icons-material/Delete';
+
+
+const title = ["掃除","洗濯","料理","仕事"]
+const init = title.map((t,index) => ({ id: index,
+    draggableId: `${index}`,
+    text: t})
+    )
+
+
 export const TaskCard = ({
     taskCardsList, 
     setTaskCardsList, 
     taskCard, 
     index,
 }) =>{
+
     const [inputText, setInputText] = useState("");
-    const [taskList, settaskList] = useState([]);
+    const [taskList, setTaskList] = useState([]);
+
+    const handleDeleteCard = () => {
+       setTaskCardsList(taskCardsList.filter(t => t.id !== taskCard.id))
+    }
 
 
     return (
         <Draggable draggableId={taskCard.draggableId} index={index}>
             {(provided) => (
                 <div 
-                    className="taskCard" 
                     ref={provided.innerRef} 
                     {...provided.draggableProps}
+                    className="taskCard"
                 >
                     <div
-                    className="taskCardTitleAndTaskCardDeleteButtonArea"
                     {...provided.dragHandleProps}
+
                     >
-                        <TaskCardTitle/>
-                        {/* <TaskCardDeleteButton 
-                            taskCardsList={taskCardsList}
-                            setTaskCardsList={setTaskCardsList} 
-                            taskCard={taskCard}
-                        /> */}
+                     <IconButton 
+                        style={{position:"absolute", top:0, right:0}}
+                        onClick={handleDeleteCard}
+                        >
+                         <DeleteIcon/>
+                    </IconButton>
+                    <TaskCardTitle/>
                     </div>
+                    <Tasks 
+                        inputText={inputText} 
+                        taskList={taskList} 
+                        setTaskList={setTaskList}
+                    />
                     <TaskAddInput
                     inputText={inputText}
                     setInputText={setInputText}
-                    settaskList={settaskList}
+                    setTaskList={setTaskList}
                     taskList={taskList}
                     />
-                    <Tasks 
-                    inputText={inputText} 
-                    taskList={taskList} 
-                    settaskList={settaskList}/>
 
                 </div>
             )}

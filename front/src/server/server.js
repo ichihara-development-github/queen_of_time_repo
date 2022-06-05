@@ -22,7 +22,14 @@ currentJoinRoom.on("connect", function(socket){
     });
     
     socket.on("SEND_MESSAGE",function(message){
+        console.log("send")
         io.of('/current').in(`room_${message.room_id}`).emit("RECIEVE_MESSAGE", message)
+    });
+
+    
+    socket.on("CANCEL_MESSAGE",function(roomId,id){
+        console.log("cancel send")
+        io.of('/current').in(`room_${roomId}`).emit("REMOVE_MESSAGE", id)
     });
 
     socket.on("disconnect", function(){

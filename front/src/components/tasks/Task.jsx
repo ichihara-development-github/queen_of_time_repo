@@ -1,40 +1,49 @@
+import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 
-export const Task = (props) =>{
+import CancelIcon from '@mui/icons-material/Cancel';
 
-    console.log(props);
+export const Task = ({
+    task,
+    taskList,
+    setTaskList,
+    index
+}) =>{
 
-    const task = props.task;
-    const taskList = props.taskList;
-    const settaskList = props.setTaskList;
-    const index = props.index;
-
-    
-    console.log(taskList);
-
-    const handleDelete = (id) => {
-        settaskList(taskList.filter(() => task.id !== id));
+    const handleDelete = () => {
+        setTaskList(taskList.filter(elm => elm.id !== task.id));
     };
 
     
     
     return (
-    <Draggable index={index} draggableId={task.draggableId}>
+    <Draggable 
+        index={index}
+        draggableId={task.draggableId}
+    >
         {(provided) => (
-            <div 
-                className="taskBox" 
-                key={task.id} 
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-            >
-            <p className="taskText">{task.text}</p>
-            <button className="taskTrashButton" onClick={()=> handleDelete(task.id)}>
-                <i className="fas fa-trash-alt">☑</i>
-            </button>
-        </div>
+            <Paper
+            key={task.id} 
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className="taskContent"
+                >
+                <Stack 
+                    sx={{width:"100%"}}
+                    direction="row" 
+                    alignItems="center"
+                >
+                    <Typography variant="h6">{task.text}</Typography>
+                    <IconButton style={{marginLeft: "auto"}} onClick={handleDelete}>
+                        <CancelIcon />
+                    </IconButton>
+
+                </Stack>
+        </Paper>
         )}
+        
     </Draggable>
 
     

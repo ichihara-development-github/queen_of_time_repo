@@ -65,7 +65,6 @@ module Api
         end
 
         def determine_shifts
-            debugger
             params[:shifts].each do |s|
                 shift = Shift.find(s[:id])
                 shift.update_columns(
@@ -82,7 +81,6 @@ module Api
         end
 
         def destroy
-
             Shift.find(params[:id]).destroy
             render json: {
                 shifts: @organization.shifts

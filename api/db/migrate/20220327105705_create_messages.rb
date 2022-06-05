@@ -1,15 +1,17 @@
 class CreateMessages < ActiveRecord::Migration[5.2]
 
   def change
+
     create_table :rooms do |t|
-      t.integer :chief_id
-      t.integer :companion_id
       t.timestamps
     end
-    add_index :rooms, :chief_id
-    add_index :rooms, :companion_id
-    add_index :rooms, [:chief_id, :companion_id], unique: true
- 
+
+    create_table :employee_rooms do |t|
+      t.references :employee
+      t.references :room
+      t.timestamps
+    end
+   
     create_table :messages do |t|
       t.references :room
       t.references :employee

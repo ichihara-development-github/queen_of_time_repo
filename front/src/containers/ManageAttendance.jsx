@@ -1,28 +1,31 @@
-import React, { useEffect, useReducer, useState } from "react"
+import React, { useEffect, useReducer, useState, useContext } from "react"
 
-import { Button, CircularProgress, List, Stack } from "@mui/material";
+import { Button, CircularProgress, List, Stack, Switch, Typography } from "@mui/material";
 import { AttendanceReducer, initialState } from "../reducers/attendances";
 import { AttendanceGraph } from "../components/attendances/AttendanceGraph";
 import { approveRequest, fetchManageAttendance } from "../apis/attendance";
-import { } from "../apis/timestamp";
 import { SelectDate } from "../components/shared/SelectDate";
+import { BadgeContext } from "../contexts/badge";
+import { SnackbarContext } from "../contexts/snackBar";
+import { Box } from "@mui/system";
 
 const SCALE = 4;
 
 
 export const ManageAttendance = ({
-  setOpenState,
-  badge,
-  setBadge,
-  setSbParams
+ 
 }) => {
 
   //----------------------state----------------
 
 const [checked, setChecked]= useState([]);
-const [state, dispatch] = useReducer(AttendanceReducer, initialState);
 const [list, setList] = useState([]);
+const [filter, setFilter] = useState(false);
 const [loading, setLoading] = useState(false);
+
+const [state, dispatch] = useReducer(AttendanceReducer, initialState);
+const sb = useContext(SnackbarContext)
+const badge = useContext(BadgeContext)
 
 const handleCheck = (e) => {
     
@@ -47,13 +50,14 @@ const approveTimecard = () => {
     approveRequest(ids)
     .then(res => {
       if(res.status !== 200){
-        setSbParams({variant: "error", content: "承認できませんでした", open: true})
-        setLoading(true)
+        sb.setSnackBar({variant: "error", content: "承認できませんでした", open: true})
+        setLoading(false)
         return
       }
       setList(res.data.attendances)
-      setSbParams({variant: "success", content: "勤怠を承認しました", open: true})
-  })
+      sb.setSnackBar({variant: "success", content: "勤怠を承認しました", open: true})
+      setLoading(false)
+      badge.setBadge({...badge.badge, attendance: res.data.attendances.filter(elm => !elm.confirmed).length})})
   }catch (e){
     console.log(e.message);
   }
@@ -69,8 +73,6 @@ const approveTimecard = () => {
       dispatch({type: "FETCH_END",
       payload: res.data.attendances
     })
-    setBadge({...badge,
-       attendance: res.data.attendances.filter(elm => elm.confirmed == false).length})
   })
     }catch (e){
       console.log(e.message);
@@ -79,14 +81,27 @@ const approveTimecard = () => {
 
       return(
       <>      
-      <div style={{ height: 450, width: '95%', margin: 30 }}>
-        <Stack sx={{my:2}} direction="row">
-        <SelectDate 
-          list={state.attendanceData}
-          setList={setList}
-          />
-          <Button 
-            style={{marginLeft: "auto"}}
+      <div style={{ height: 450, width: '95%' }}>
+        <Stack sx={{my:1}} direction="row">
+        {filter ? 
+          ""
+          :
+            <SelectDate 
+            list={state.attendanceData}
+            setList={setList}
+            />
+        }
+
+        <Box  style={{marginLeft:"auto"}}>
+        <Stack direction="row" alignItems="center">
+            <Switch
+           
+              checked={filter}
+              onChange={() => setFilter(!filter)}
+            />
+            <Typography variant="subtitle1">未承認のみ</Typography>
+            <Button 
+            style={{marginLeft:"auto"}}
             variant="contained" 
             color="success"
             disabled={(checked.length == 0 || loading)}
@@ -95,19 +110,18 @@ const approveTimecard = () => {
               {approveTimecard()}
             }}
             endIcon={loading ? <CircularProgress sx={{width: "1rem", height: "1rem"}} />:""}
-
             >
             　　　承　認　　　
         </Button>
+          </Stack>
+          
 
+        </Box>
 
         </Stack>
-
-        
-            
           <AttendanceGraph 
             state={state.fetchState} 
-            list={list}
+            list={filter ? state.attendanceData.filter(l => !l.confirmed) : list}
             handleCheck={handleCheck}
           />
 
